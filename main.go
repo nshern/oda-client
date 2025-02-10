@@ -46,11 +46,29 @@ func getFolderPaths(connection *ftp.ServerConn) []string {
 	return folderPaths
 }
 
+func getFilePaths(folderPaths []string, connection *ftp.ServerConn) []string {
+
+	var filePaths []string
+
+	for _, folderPath := range folderPaths {
+		connection.ChangeDir(folderPath)
+		currentDir, _ := connection.CurrentDir()
+		files, _ := connection.List(currentDir)
+		for _, file := range files {
+            filePath := (currentDir + "/" + file.Name)
+            filePaths = append(filePaths,filePath)
+		}
+	}
+
+    return filePaths
+}
+
 func main() {
 	connection := establishConnection()
-	paths := getFolderPaths(connection)
+	folderPaths := getFolderPaths(connection)
+    filePaths := getFilePaths(folderPaths, connection)
 
-	for _, v := range paths {
+	for _, v := range filePaths {
 		fmt.Println(v)
 	}
 
